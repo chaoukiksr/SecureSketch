@@ -7,10 +7,11 @@ import apis from './modles/apis.js';
 import Usage from './modles/usageModel.js';
 import User from './modles/userModel.js';
 import Plan from './modles/planModel.js';
+import userRoutes from './routes/userRoutes.js'
 
-
-
-
+app.use(express.json())
+app.use(express.urlencoded({extended:true}))
+app.use('/',userRoutes)
 
 
 const startApp = async ()=>{
@@ -25,7 +26,7 @@ const startApp = async ()=>{
 })
    } catch (error) {
       console.error(`Error while setting up the database: ${error}`)
-      throw error
+      // throw error
    }
 }
 startApp()

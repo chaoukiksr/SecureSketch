@@ -20,9 +20,9 @@ class Usage {
                
             } catch (error) {
                
+               console.error(`error when creating usage table: ${error}`)
+               // throw error
             }
-            console.error(`error when creating usage table: ${error}`)
-            throw error
          }
          async insertUsage (usage){
             const {totalReqs} = usage

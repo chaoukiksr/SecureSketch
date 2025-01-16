@@ -14,6 +14,7 @@ const createUserTable = async () => {
       isAdmin boolean default false,
       planId int ,
       usageId int ,
+      api_key varchar (25) not null unique,
       foreign key (planId) references plans(id),
       foreign key (usageId) references usages(id)
       );

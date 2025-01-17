@@ -13,15 +13,19 @@ class Usage {
             totalReqs int not null
             )
             `
+            const connection = await pool.getConnection()
             try {
-               const result = pool.query(query)
+               await connection.beginTransaction()
+               const result = connection.query(query)
                console.log('usage table is created or already exists')
                return result
                
             } catch (error) {
-               
+               connection.rollback()
                console.error(`error when creating usage table: ${error}`)
-               // throw error
+               throw error
+            } finally{
+               connection.release()
             }
          }
          async insertUsage (usage){
@@ -29,13 +33,18 @@ class Usage {
             const query = `
          insert into usages (totalReqs) values (?)
          `
+         const connection = await pool.getConnection()
          try {
-            const [result] = await pool.query(query,[totalReqs])
+            await connection.beginTransaction()
+            const [result] = await connection.query(query,[totalReqs])
             this.id = result.insertId
             console.log(`usages record is inserted`)
          } catch (error) {
+            connection.rollback()
             console.error(`error inserting usage record! ${error}`)
             throw error
+         } finally{
+            connection.release()
          }
          }
       }

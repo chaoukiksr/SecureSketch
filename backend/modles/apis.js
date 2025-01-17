@@ -22,13 +22,18 @@ class apis{
    FOREIGN KEY (userId) REFERENCES users(id)
 );
       `
+      const connection =  await pool.getConnection()
       try {
-         const result = await pool.query(query)
+         connection.beginTransaction()
+         const result = await connection.query(query)
          console.log(`apis tables is created or already exists`)
          return result
       } catch (error) {
+         connection.rollback()
          console.error(`error creating apis table: ${error}`)
-         // throw error
+         throw error
+      } finally{
+         connection.release()
       }
 
    }

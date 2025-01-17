@@ -22,7 +22,7 @@ class Plan{
             return result
          } catch (error) {
             console.error(`error when creating plan table: ${error}`)
-            throw error
+            // throw error
             
          }
       }

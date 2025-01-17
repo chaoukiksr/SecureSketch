@@ -11,7 +11,7 @@ class apis{
    }
    static async createApisTable(){
       const query = `
-      CREATE TABLE api_keys (
+      CREATE TABLE if not exists api_keys (
    id INT AUTO_INCREMENT PRIMARY KEY,
    apiKey VARCHAR(30) NOT NULL UNIQUE,
    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -28,7 +28,7 @@ class apis{
          return result
       } catch (error) {
          console.error(`error creating apis table: ${error}`)
-         throw error
+         // throw error
       }
 
    }

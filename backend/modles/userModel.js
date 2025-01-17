@@ -1,7 +1,7 @@
 import pool from '../config/dbconfig.js'
-
+import verifyCredintials from "../utils/verifyCredintials.js"
 class User {
-   constructor(id=null,{name, email, password, isVerified=false, isAdmin=false, planId=0, usageId=null}){
+   constructor({id=null,name, email, password, isVerified=false, isAdmin=false, planId=0, usageId=null}){
       this.id = id
       this.name = name
       this.email = email
@@ -35,24 +35,25 @@ class User {
       } catch (error) {
          console.error(`error creating users table ${error}
             `)
-            throw error
+            // throw error
          
      }
    }
 
-   async insertUser(user){
-      const { name, email, password, isVerified, isAdmin, planId, usageId} = user
-      if(verifiedCredintials(user)){
+   async insertUser(){
+      // console.log(user)
+      // const { name, email, password, isVerified, isAdmin, planId, usageId} = user
+      if (verifyCredintials(this)){
          const query = `
          insert into users (name,email,password,isVerified,isAdmin,planId,usageId) values (?,?,?,?,?,?,?)
          `
          try {
-            const [result] =  pool.query(query,[name,email,password,isVerified,isAdmin,planId,usageId])
+            const [result] = await pool.query(query,[this.name,this.email,this.password,this.isVerified,this.isAdmin,this.planId,this.usageId])
             this.id = result.insertId
-            console.log(`successfully inserting user: ${user}`)
+            console.log(`successfully inserting user: `)
             return result
          } catch (error) {
-            console.error(`Error while inserting user: ${user}`)
+            console.error(`Error while inserting user:`)
             throw error
          }
       }

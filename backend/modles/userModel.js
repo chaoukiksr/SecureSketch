@@ -27,21 +27,22 @@ class User {
       foreign key (usageId) references usages(id)
       );
       `
-      const connection = await pool.getConnection()
+      let connection
       try {
+         connection = await pool.getConnection()
          await connection.beginTransaction();
-         const result = await connection.query(usersTableCreationQuery)
+         const result = await connection.execute(usersTableCreationQuery)
          await connection.commit()
          console.log(`users table is created or already exists`)
          return result
       } catch (error) {
-         await connection.rollback()
+         if (connection) await connection.rollback()
          console.error(`error creating users table ${error}
             `)
          // throw error
 
-      } finally{
-         connection.release()
+      } finally {
+         if (connection) connection.release()
       }
    }
 
@@ -49,20 +50,43 @@ class User {
       const query = `
          insert into users (name,email,password,isVerified,isAdmin,planId,usageId) values (?,?,?,?,?,?,?)
          `
-         const connection = await pool.getConnection()
+      let connection
       try {
-         const [result] = await connection.query(query, [this.name, this.email, this.password, this.isVerified, this.isAdmin, this.planId, this.usageId])
+         connection = await pool.getConnection()
+         await connection.beginTransaction()
+         const [result] = await connection.execute(query, [this.name, this.email, this.password, this.isVerified, this.isAdmin, this.planId, this.usageId])
+         await connection.commit()
          this.id = result.insertId
          console.log(`successfully inserting user: `)
          return result
       } catch (error) {
-         await connection.rollback()
+         if (connection) await connection.rollback()
          console.error(`Error while inserting user:`)
          throw error
-      } finally{
-         connection.release()
+      } finally {
+         if (connection) connection.release()
       }
 
+
+   }
+   static async findUserByEmail(email) {
+      const query = `
+      select * from users where email = ?
+      `
+      let connection
+      try {
+         connection = await pool.getConnection()
+         await connection.beginTransaction()
+         const [rows] = await connection.execute(query, [email])
+         await connection.commit()
+         return rows.length > 0 ? rows[0] : null
+      } catch (error) {
+         if (connection) await connection.rollback()
+         console.log(error)
+         throw error
+      } finally {
+         if (connection) connection.release()
+      }
 
    }
 

@@ -1,23 +1,31 @@
 import User from "../modles/userModel.js"
 import hashData from "../utils/hashData.js"
+import mailService from "../utils/mailService.js"
+import sendMail from "../utils/mailService.js"
 export default {
    registreUser: async (req, res) => {
 
       const { name, email, password } = req.body
       const userExists = await User.findUserByEmail(email)
-      console.log(userExists)
+    
 
       if (userExists) {
         return res.status(400).json({ message: "email already exists" })
-         
       }
 
       const newUser = new User({ name, email, password: await hashData(password)})
       try {
          await newUser.insertUser()
-         console.log(`Success inserting the new User: ${newUser.id}`)
-         res.status(200).json({ message: `Success inserting the new User: ${newUser.id}` })
-         // return result
+       let mailOpt = {
+          from: 'kessourichaouki@gmail.com',
+          to: newUser.email,
+          subject: 'OTP',
+          text: 'Your verification code is 137FX44'
+        }
+       let response =  await sendMail(mailOpt)
+       console.log(response)
+        return res.status(200).json({ message: `Success inserting the new User: ${newUser.id}, ${newUser.name}, ${newUser.email}` })
+        
       } catch (error) {
         return res.status(500).json({ message: `An error occured when inserting the user` })
          
@@ -26,3 +34,5 @@ export default {
 
    }
 }
+
+

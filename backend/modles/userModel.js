@@ -57,7 +57,7 @@ class User {
          const [result] = await connection.execute(query, [this.name, this.email, this.password, this.isVerified, this.isAdmin, this.planId, this.usageId])
          await connection.commit()
          this.id = result.insertId
-         console.log(`successfully inserting user: `)
+         console.log(`successfully inserting user: ${this.id}, ${this.name}, ${this.email}`)
          return result
       } catch (error) {
          if (connection) await connection.rollback()
@@ -78,6 +78,7 @@ class User {
          connection = await pool.getConnection()
          await connection.beginTransaction()
          const [rows] = await connection.execute(query, [email])
+         console.log(rows)
          await connection.commit()
          return rows.length > 0 ? rows[0] : null
       } catch (error) {

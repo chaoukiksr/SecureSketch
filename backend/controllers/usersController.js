@@ -18,18 +18,15 @@ export default {
 
     const newUser = new User({ name, email, password: await hashData(password) })
     try {
-      
-      
       await newUser.insertUser()
       let otpCode = await generateOTP()
       let hashedOtp = await hashData(otpCode.toString())
       let redisKey = `otp:user:${newUser.email}`
      await redisClient.set(redisKey, hashedOtp,'EX',200)
-     await redisClient.get(redisKey)
+    const savedRedisOtp = await redisClient.get(redisKey)
+    console.log(savedRedisOtp)
       await sendMail(newUser.email,otpCode)
-      return res.status(200).json({ message: `Success inserting the new User: ${newUser.id}, ${newUser.name}, ${newUser.email}, ${otpCode}
-
-        ` })
+      return res.status(200).json({ message: `Success inserting the new user ${otpCode}` })
 
     } catch (error) {
       return res.status(500).json({ message: `An error occured when inserting the user: ${error}` })
@@ -48,14 +45,17 @@ export default {
       }
 
       if ( await bcrypt.compare(otp.toString(), storedHashedOtp)) {
-        redisClient.del(redisKey)
-       return res.status(200).json({accountVerified:true,message:'otp is verified'})
+      redisClient.del(redisKey)
+      const userVerificationState = true
+       await User.updateUser('isVerified', userVerificationState, email)
+      
+       return res.status(200).json({accountVerified:userVerificationState,message:'otp is verified'})
       }else{
         return res.status(404).json({ accountVerified: true, message: 'wrong otp, check otp code or regenerate a new one' })
         
       }
     } catch (error) {
-     return res.status(500).json({message:'Error'})
+     return res.status(500).json({message:`Error: ${error}`})
     }
   }
 }

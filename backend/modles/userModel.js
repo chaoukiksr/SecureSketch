@@ -90,6 +90,26 @@ class User {
       }
 
    }
+   static async updateUser(field, value, email){
+      const query = `
+      update users set ${field} = ? where email = ?
+      `
+      const connection = await pool.getConnection()
+      try {
+         await connection.beginTransaction()
+       await connection.execute(query,[value,email])
+         await connection.commit()
+         return response.affectedRows
+      } catch (error) {
+        if(connection) connection.rollback()
+         console.log(error)
+      throw error
+      } finally{
+         if (connection) connection.release()
+            console.log('connection is released')
+      }
+
+   }
 
 }
 

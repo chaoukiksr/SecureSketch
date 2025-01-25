@@ -22,9 +22,7 @@ export default {
       let otpCode = await generateOTP()
       let hashedOtp = await hashData(otpCode.toString())
       let redisKey = `otp:user:${newUser.email}`
-     await redisClient.set(redisKey, hashedOtp,'EX',200)
-    const savedRedisOtp = await redisClient.get(redisKey)
-    console.log(savedRedisOtp)
+      await redisClient.set(redisKey, hashedOtp,'EX',200)
       await sendMail(newUser.email,otpCode)
       return res.status(200).json({ message: `Success inserting the new user ${otpCode}` })
 

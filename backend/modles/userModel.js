@@ -99,7 +99,7 @@ class User {
          await connection.beginTransaction()
        await connection.execute(query,[value,email])
          await connection.commit()
-         return response.affectedRows
+         return 
       } catch (error) {
         if(connection) connection.rollback()
          console.log(error)

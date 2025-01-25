@@ -6,7 +6,7 @@ import { validationResult } from "express-validator"
       }).withMessage('Unvalide user name'),
       body('email').trim().escape().isEmail().normalizeEmail()
       .withMessage('Invalide user email'),
-      body('password').trim().escape().isLength({min:8}).isAlphanumeric().withMessage('Invalid user password'),
+      body('password').trim().escape().matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/).withMessage('Invalid user password'),
       (req,res,next)=>{
          const errors = validationResult(req)
          if(!errors.isEmpty()){

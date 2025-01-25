@@ -4,6 +4,7 @@ import hashData from "../utils/hashData.js"
 import sendMail from "../utils/mailService.js"
 import redisClient from "../server.js"
 import bcrypt from 'bcrypt'
+import {generateJWT,verifyJWT} from '../utils/JWT.js'
 export default {
   
   registreUser: async (req, res) => {
@@ -54,6 +55,24 @@ export default {
       }
     } catch (error) {
      return res.status(500).json({message:`Error: ${error}`})
+    }
+  },
+  login: async (req,res)=>{
+    let {email,password} = req.body
+    try {
+      let userData = await User.findUserByEmail(email)
+      console.log(userData)
+      if(userData){
+        let user = new User(userData)
+        console.log(user)
+        if(await bcrypt.compare(password,user.password)){
+          const token = generateJWT({userId:user.id, verified:user.isVerified})
+          return res.status(200).json({message:"Successful login", JWT:token})
+        }
+      }
+      return res.status(200).json({message:"OK, but faild login, unfound user"})
+    } catch (error) {
+      return res.status(500).json({message:`internal server error while login in: ${error}`})
     }
   }
 }

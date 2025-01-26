@@ -1,3 +1,5 @@
 import crypto from 'crypto'
-const secret = crypto.randomBytes(32).toString('hex')
-console.log(secret)
+const generateJwtSecret = (length)=>{
+   return crypto.randomBytes(length).toString('hex')
+}
+export default generateJwtSecret

@@ -4,8 +4,10 @@ import hashData from "../utils/hashData.js"
 import sendMail from "../utils/mailService.js"
 import redisClient from "../server.js"
 import bcrypt from 'bcrypt'
-import generateSec from '../utils/jwtSecretGen.js'
+import generateJwtSecret from '../utils/jwtSecretGen.js'
 import { generateJWT, verifyJWT } from '../utils/JWT.js'
+import validateUser from "../utils/validateUser.js"
+import storeRefreshToken from "../utils/storeRefrechToken.js"
 export default {
 
   registreUser: async (req, res) => {
@@ -61,30 +63,31 @@ export default {
   login: async (req, res) => {
     let { email, password } = req.body
     try {
-      let userData = await User.findUserByEmail(email)
-      if (userData) {
-        let user = new User(userData)
-        if (await bcrypt.compare(password, user.password)) {
-          const token = generateJWT({ userId: user.id, role: "user" })
-          //verify if the user has a refrechToken
-          let redisKey = `refrechToken:user:${email}`
-          let refreshToken = await redisClient.get(redisKey)
-          //if not
-          if (!refreshToken) {
-            refreshToken = generateSec(parseInt(process.env.LENGTH))
-            await redisClient.set(redisKey, refreshToken, 'EX', process.env.REFRESH_TIME)
-          }
-          return res.status(200).json({
-            message: "Successful login",
-            userJWT: token,
-            refreshToken: refreshToken
-          })
-        }
+      let user = await validateUser(email, password)
+      if (!user) {
+        return res.status(401).json({
+          status: "faild",
+          message: "Invalid Credintials"
+        })
       }
-      return res.status(401).json({
-        status: "faild",
-        message: "Invalid Credintials"
+
+      const token = generateJWT({ userId: user.id, role: user.isAdmin})
+      let refreshToken = generateJwtSecret(parseInt(process.env.LENGTH))
+      
+      storeRefreshToken(email,refreshToken)
+      res.cookie('refrechToken',refreshToken,{
+        httpOnly:true,
+        secure:true,
+        sameSite:'Strict',
+        maxAge: parseInt(process.env.REFRESH_TIME) * 1000
       })
+      return res.status(200).json({
+        message: "Successful login",
+        userJWT: token
+      })
+
+
+
     } catch (error) {
       return res.status(500).json({
         status: "faild",

@@ -1,6 +1,6 @@
 import express from 'express'
 import usersController from '../controllers/usersController.js'
-import validateData from '../utils/validateData.js'
+import validateData from '../utils/validateRegistrationData.js'
 import validateReq from '../utils/validateReq.js'
 import validateOTP from '../utils/validateOTP.js'
 import validateLoginData from '../utils/validateLoginData.js'

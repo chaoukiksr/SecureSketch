@@ -73,7 +73,7 @@ export default {
 
       const token = generateJWT({ userId: user.id, role: user.isAdmin})
       let refreshToken = generateJwtSecret(parseInt(process.env.LENGTH))
-      
+      console.log(refreshToken)
       storeRefreshToken(email,refreshToken)
       res.cookie('refrechToken',refreshToken,{
         httpOnly:true,
@@ -94,6 +94,11 @@ export default {
         message: `internal server error while login in: ${error}`
       })
     }
+  },
+  showProfile: (req,res) =>{
+   return res.status(200).json({
+      message:"You are in the profile"
+    })
   }
 }
 

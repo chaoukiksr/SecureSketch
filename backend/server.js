@@ -10,6 +10,7 @@ import Plan from './modles/planModel.js';
 import userRoutes from './routes/userRoutes.js'
 import killPort from 'kill-port';
 import redis from 'redis'
+import rateLimit from './utils/rateLimiter.js';
 const redisClient = redis.createClient()
 redisClient.connect()
 redisClient.on('connect', () => {
@@ -22,7 +23,7 @@ redisClient.on('error', (err) => {
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 app.use('/',userRoutes)
-
+app.use(rateLimit)
 
 const startApp = async ()=>{
    try {

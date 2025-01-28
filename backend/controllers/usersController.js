@@ -71,9 +71,8 @@ export default {
         })
       }
 
-      const token = generateJWT({ userId: user.id, role: user.isAdmin})
+      const token = generateJWT({ userId: user.id, role: user.isAdmin == 0 ? "user" : "admin"})
       let refreshToken = generateJwtSecret(parseInt(process.env.LENGTH))
-      console.log(refreshToken)
       storeRefreshToken(email,refreshToken)
       res.cookie('refrechToken',refreshToken,{
         httpOnly:true,
@@ -83,7 +82,8 @@ export default {
       })
       return res.status(200).json({
         message: "Successful login",
-        userJWT: token
+        userJWT: token,
+        refreshToken:refreshToken
       })
 
 

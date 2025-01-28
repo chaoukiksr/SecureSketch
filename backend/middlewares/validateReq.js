@@ -4,6 +4,5 @@ const validateReq = (req,res,next)=>{
        error:req.validatedData})
    }
    next()
-   console.log(req.email)
 }
 export default validateReq

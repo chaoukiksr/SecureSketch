@@ -1,9 +1,9 @@
 import express from 'express'
 import usersController from '../controllers/usersController.js'
-import validateData from '../utils/validateRegistrationData.js'
-import validateReq from '../utils/validateReq.js'
-import validateOTP from '../utils/validateOTP.js'
-import validateLoginData from '../utils/validateLoginData.js'
+import validateData from '../middlewares/validateRegistrationData.js'
+import validateReq from '../middlewares/validateReq.js'
+import validateOTP from '../middlewares/validateOTP.js'
+import validateLoginData from '../middlewares/validateLoginData.js'
 import authenticate from '../middlewares/authenticate.js'
 const router = express.Router()
 

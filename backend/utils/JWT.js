@@ -9,7 +9,7 @@ const generateJWT = (payload) =>{
 }
 
 const verifyJWT = (token)=>{
-   return jwt.verify(token,process.env.JWT_SECRET)
+   return  jwt.verify(token,process.env.JWT_SECRET)
 }
 
 export {generateJWT,verifyJWT}
